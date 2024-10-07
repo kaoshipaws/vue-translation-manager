@@ -200,7 +200,10 @@ TranslationManager.prototype.getSuggestedKey = async function (pathToFile, text,
   var words = text.trim().split(' ')
   if (words.length > 4) words = words.slice(0, 3)
 
-  let word = words.map(w => w.toUpperCase()).join('_');
+  let word = words
+    .map(w => w.toUpperCase().replace(/[^A-Z]/g, ''))
+    .filter(w => w)
+    .join('_');
   if (!word) word = `TESTSTRING_${Math.floor(Math.random() * 10000)}`;
   let proposedKey = await this.getCompatibleKey(`${word}`, usedKeys)
 
