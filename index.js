@@ -197,21 +197,12 @@ TranslationManager.prototype.replaceStringsInComponent = function (pathToCompone
  * @returns {string}
  */
 TranslationManager.prototype.getSuggestedKey = async function (pathToFile, text, usedKeys) {
-  const ignoreWords = ['src', 'components', 'component', 'source', 'test']
-
-  var p = path.relative(this.rootPath, pathToFile)
-  var prefix = p
-    .split('/')
-    .filter((part) => ignoreWords.indexOf(part.trim()) < 0)
-    .map((key) => key.toLowerCase().split('.')[0])
-    .join('.')
-
   var words = text.trim().split(' ')
   if (words.length > 4) words = words.slice(0, 3)
 
-  let word = camelCase(words.join(' ').replace(/[^a-zA-Z ]/g, ''))
-  if (!word) word = Math.floor(Math.random() * 10000)
-  let proposedKey = await this.getCompatibleKey(`${prefix}.${word}`, usedKeys)
+  let word = words.map(w => w.toUpperCase()).join('_');
+  if (!word) word = `TESTSTRING_${Math.floor(Math.random() * 10000)}`;
+  let proposedKey = await this.getCompatibleKey(`${word}`, usedKeys)
 
   return proposedKey
 }
