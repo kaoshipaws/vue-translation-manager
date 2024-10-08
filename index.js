@@ -199,7 +199,7 @@ TranslationManager.prototype.replaceStringsInComponent = function (pathToCompone
  */
 TranslationManager.prototype.getSuggestedKey = async function (pathToFile, text, usedKeys) {
   var words = text.trim().split(' ')
-  if (words.length > 4) words = words.slice(0, 3)
+  if (words.length > 7) words = words.slice(0, 6)
 
   let word = words
     .map(w => transliterate(w).toUpperCase().replace(/[^A-Z_0-9]/g, ''))
