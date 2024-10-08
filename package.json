@@ -26,10 +26,10 @@
 	"author": "kaoshipaws",
 	"license": "ISC",
 	"devDependencies": {
-		"standard": "^11.0.1",
-		"tap-spec": "^5.0.0",
+		"standard": "^17.1.2",
+		"tap-spec": "^2.2.2",
 		"tape": "^4.9.1",
-		"vuepress": "^0.14.2"
+		"vuepress": "^1.9.10"
 	},
 	"dependencies": {
 		"chalk": "^2.4.1",
@@ -41,6 +41,7 @@
 		"lodash.uniq": "^4.5.0",
 		"lodash.unset": "^4.5.2",
 		"replace-string": "^1.1.0",
-		"yargs": "^12.0.1"
+		"transliteration": "^2.3.5",
+		"yargs": "^17.7.2"
 	}
 }

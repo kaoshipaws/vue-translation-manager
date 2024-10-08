@@ -3,6 +3,7 @@ const path = require('path')
 const execall = require('execall')
 const glob = require('glob')
 const uniq = require('lodash.uniq')
+const { transliterate } = require('transliteration');
 
 /**
  * Initialize the translation manager
@@ -201,10 +202,10 @@ TranslationManager.prototype.getSuggestedKey = async function (pathToFile, text,
   if (words.length > 4) words = words.slice(0, 3)
 
   let word = words
-    .map(w => w.toUpperCase().replace(/[^A-Z]/g, ''))
+    .map(w => transliterate(w).toUpperCase().replace(/[^A-Z_0-9]/g, ''))
     .filter(w => w)
     .join('_');
-  if (!word) word = `TEST_STRING_${Math.floor(Math.random() * 10000)}`;
+  if (!word) word = `UNDEFINED_STRING_${Math.floor(Math.random() * 10000)}`;
   let proposedKey = await this.getCompatibleKey(`${word}`, usedKeys)
 
   return proposedKey
