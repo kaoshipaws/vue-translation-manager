@@ -4,6 +4,8 @@ const execall = require('execall')
 const glob = require('glob')
 const uniq = require('lodash.uniq')
 const { transliterate } = require('transliteration');
+const inquirer = require('inquirer');
+
 
 /**
  * Initialize the translation manager
@@ -191,25 +193,42 @@ TranslationManager.prototype.replaceStringsInComponent = function (pathToCompone
 }
 
 /**
- * Generate a suggested key (using dots) based on the given path
- * @param {string} pathToFile Path to the file
- * @param {string} text The text to be translated
- * @param {array} usedKeys Optional, array of keys that have already been used
- * @returns {string}
+ * Prompt the user to input a custom translation key for a given text, or use a suggested key if none is provided.
+ * The key is generated based on the transliterated and formatted text, avoiding duplicates by checking used keys.
+ * @param {string} pathToFile - The path of the file where the translation will be used.
+ * @param {string} text - The text that requires translation.
+ * @param {array} usedKeys - (Optional) An array of keys that have already been used, to prevent duplicates.
+ * @returns {Promise<string>} - The chosen or generated translation key.
  */
 TranslationManager.prototype.getSuggestedKey = async function (pathToFile, text, usedKeys) {
-  var words = text.trim().split(' ')
-  if (words.length > 7) words = words.slice(0, 6)
+  const words = text.trim().split(' ');
+  const limitedWords = words.length > 7 ? words.slice(0, 6) : words;
 
-  let word = words
+  let word = limitedWords
     .map(w => transliterate(w).toUpperCase().replace(/[^A-Z_0-9]/g, ''))
     .filter(w => w)
     .join('_');
   if (!word) word = `UNDEFINED_STRING_${Math.floor(Math.random() * 10000)}`;
-  let proposedKey = await this.getCompatibleKey(`${word}`, usedKeys)
+  
+  const generatedKey = await this.getCompatibleKey(`${word}`, usedKeys);
 
-  return proposedKey
-}
+  const prompt = inquirer.createPromptModule();
+  const answer = await prompt({
+    type: 'input',
+    name: 'customKey',
+    message: `Enter a custom key for "${text}" (or press Enter to use "${generatedKey}"): `,
+    default: generatedKey
+  });
+
+  // Преобразуем введенный ключ в формат с заглавными буквами и подчеркиваниями
+  const customKey = answer.customKey || generatedKey;
+  const formattedKey = customKey
+    .replace(/\s+/g, '_')        // Заменяем пробелы на подчеркивания
+    .toUpperCase()               // Переводим все буквы в верхний регистр
+    .replace(/[^A-Z_0-9]/g, ''); // Убираем все недопустимые символы
+  
+  return formattedKey;
+};
 
 TranslationManager.prototype.getCompatibleKey = async function (suggestedKey, usedKeys) {
   let keys = await this.adapter.getAllKeys()
